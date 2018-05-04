@@ -62,7 +62,9 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 
 # mpd copy binary
 /usr/local/bin/mpd: mpd/MPD-$(MPD_VERSION)/src/mpd
+	@- systemctl stop mpd
 	cp mpd/MPD-$(MPD_VERSION)/src/mpd /usr/local/bin/mpd
+	@- systemctl start mpd
 
 /lib/systemd/system/mpd.service: lib/systemd/system/mpd.service
 	cp lib/systemd/system/mpd.service /lib/systemd/system/mpd.service
