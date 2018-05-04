@@ -51,11 +51,11 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 	cd mpd/MPD-$(MPD_VERSION) && ./configure $(MPD_OPTIONS)
 
 /etc/mpd.conf:
-	useradd -r -g audio -s /sbin/nologin mpd
+	-@useradd -r -g audio -s /sbin/nologin mpd
 	cp mpd/mpd.conf /etc/mpd.conf
 	chown mpd:audio /etc/mpd.conf
 
 /var/lib/mpd:
-	useradd -r -g audio -s /sbin/nologin mpd
+	-@useradd -r -g audio -s /sbin/nologin mpd
 	mkdir -p /var/lib/mpd
 	chown mpd:audio /var/lib/mpd
