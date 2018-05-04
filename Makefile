@@ -24,11 +24,18 @@ tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w ac
 	cp etc/tmpfiles.d/log.conf $(ROOT)etc/tmpfiles.d/log.conf
 
 
-rmdesktop:  ## remove desktop daemon
+rmdesktop: /lib/systemd/system/nohdmi.service  ## remove desktop daemon
 	systemctl disable keyboard-setup
 	systemctl disable triggerhappy
 	systemctl disable bluetooth
 	systemctl disable rpi-display-backlight
+
+/lib/systemd/system/nohdmi.service:
+	cp lib/systemd/system/nohdmi.service /lib/systemd/system/nohdmi.service
+	systemctl daemon-reload
+	systemctl enable nohdmi
+
+
 
 
 # mpd
@@ -39,10 +46,11 @@ mpd-config: /etc/mpd.conf /var/lib/mpd /var/run/mpd
 
 /lib/systemd/system/mpd.service: mpd/mpd.service
 	cp mpd/mpd.service /lib/systemd/system/mpd.service
+	systemctl daemon-reload
+	systemctl enable mpd
 
 /usr/local/bin/mpd: mpd/MPD-$(MPD_VERSION)/src/mpd
 	cp mpd/MPD-$(MPD_VERSION)/src/mpd /usr/local/bin/mpd
-	systemctl daemon-reload
 
 mpd/v$(MPD_VERSION).tar.gz:
 	mkdir -p mpd
