@@ -39,6 +39,7 @@ tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w ac
 	cp etc/tmpfiles.d/log.conf /etc/tmpfiles.d/log.conf
 
 # mpd
+MPD_DIRS = /var/lib/mpd /var/lib/mpd/playlists /var/lib/mpd/music /var/lib/mpd/
 install-mpd: /usr/local/bin/mpd mpd-config $(MPD_DIRS) ## install mpd
 mpd-config: /lib/systemd/system/mpd.service /etc/mpd.conf /etc/tmpfiles.d/mpd.conf
 
@@ -77,8 +78,6 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 
 /etc/tmpfiles.d/mpd.conf: etc/tmpfiles.d/mpd.conf
 	cp etc/tmpfiles.d/mpd.conf /etc/tmpfiles.d/mpd.conf
-
-MPD_DIRS = /var/lib/mpd /var/lib/mpd/playlists /var/lib/mpd/music /var/lib/mpd/
 
 $(MPD_DIRS):
 	@- useradd -r -g audio -s /sbin/nologin mpd || true
