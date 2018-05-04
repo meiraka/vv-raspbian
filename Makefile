@@ -87,7 +87,9 @@ vv/$(VV_VERSION)/vv: vv/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz
 	tar -mxvzf vv/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz -C vv/$(VV_VERSION)
 
 /usr/local/bin/vv: vv/$(VV_VERSION)/vv
+	@- systemctl stop vv || true
 	cp vv/$(VV_VERSION)/vv /usr/local/bin/vv
+	@- systemctl start vv || true
 
 /lib/systemd/system/vv.service: lib/systemd/system/vv.service
 	cp lib/systemd/system/vv.service /lib/systemd/system/vv.service
