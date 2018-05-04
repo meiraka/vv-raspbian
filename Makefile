@@ -39,9 +39,8 @@ tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w ac
 	cp etc/tmpfiles.d/log.conf /etc/tmpfiles.d/log.conf
 
 # mpd
-install-mpd: /usr/local/bin/mpd mpd-config mpd-dir ## install mpd
+install-mpd: /usr/local/bin/mpd mpd-config $(MPD_DIRS) ## install mpd
 mpd-config: /lib/systemd/system/mpd.service /etc/mpd.conf /etc/tmpfiles.d/mpd.conf
-mpd-dir: /var/lib/mpd /var/lib/mpd/tag_cache /var/lib/mpd/playlists
 
 # mpd fetch
 mpd/v$(MPD_VERSION).tar.gz:
@@ -79,18 +78,12 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 /etc/tmpfiles.d/mpd.conf: etc/tmpfiles.d/mpd.conf
 	cp etc/tmpfiles.d/mpd.conf /etc/tmpfiles.d/mpd.conf
 
-/var/lib/mpd:
+MPD_DIRS = /var/lib/mpd /var/lib/mpd/playlists /var/lib/mpd/music /var/lib/mpd/
+
+$(MPD_DIRS):
 	@- useradd -r -g audio -s /sbin/nologin mpd || true
-	mkdir -p /var/lib/mpd
-	chown mpd:audio /var/lib/mpd
-
-/var/lib/mpd/playlists: /var/lib/mpd
-	mkdir -p /var/lib/mpd/playlists
-	chown mpd:audio /var/lib/mpd/tag_cache
-
-/var/lib/mpd/tag_cache: /var/lib/mpd
-	mkdir -p /var/lib/mpd/tag_cache
-	chown mpd:audio /var/lib/mpd/tag_cache
+	mkdir -p $(MPD_DIRS)
+	chown: mpd:audio $(MPD_DIRS)
 
 # vv
 .PHONY: install-vv
