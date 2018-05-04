@@ -82,7 +82,7 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 $(MPD_DIRS):
 	@- useradd -r -g audio -s /sbin/nologin mpd || true
 	mkdir -p $(MPD_DIRS)
-	chown: mpd:audio $(MPD_DIRS)
+	chown mpd:audio $(MPD_DIRS)
 
 # vv
 .PHONY: install-vv
