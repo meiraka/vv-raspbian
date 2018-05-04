@@ -3,15 +3,28 @@ FSTAB = $(ROOT)etc/fstab
 MPD_VERSION = 0.20.19
 MPD_OPTIONS = "--disable-un --disable-fifo --disable-httpd-output --disable-recorder-output --disable-oss --disable-ipv6 --disable-dsd --disable-libmpdclient --disable-curl --with-systemdsystemunitdir=/lib/systemd/system"
 
-.PHONY: help rmswap tmpfs
+.PHONY: help noswap nodesktop tmpfs
  
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-rmswap:  ## remove swap feature && files to reduce sd card r/w access
+all: noswap nodesktop tmpfs mpd-install  ## execute all target
+
+noswap:  ## remove swap feature && files to reduce sd card r/w access
 	swapoff --all
 	apt purge -y --auto-remove dphys-swapfile
 	rm -fr /var/swap
+
+nodesktop: /lib/systemd/system/nohdmi.service  ## remove desktop daemon
+	systemctl disable keyboard-setup
+	systemctl disable triggerhappy
+	systemctl disable bluetooth
+	systemctl disable rpi-display-backlight
+
+/lib/systemd/system/nohdmi.service:
+	cp lib/systemd/system/nohdmi.service /lib/systemd/system/nohdmi.service
+	systemctl daemon-reload
+	systemctl enable nohdmi
 
 tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w access
 	mkdir -p $(ROOT)etc/tmpfiles.d
@@ -23,25 +36,9 @@ tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w ac
 /etc/tmpfiles.d/log.conf: etc/tmpfiles.d/log.conf
 	cp etc/tmpfiles.d/log.conf $(ROOT)etc/tmpfiles.d/log.conf
 
-
-rmdesktop: /lib/systemd/system/nohdmi.service  ## remove desktop daemon
-	systemctl disable keyboard-setup
-	systemctl disable triggerhappy
-	systemctl disable bluetooth
-	systemctl disable rpi-display-backlight
-
-/lib/systemd/system/nohdmi.service:
-	cp lib/systemd/system/nohdmi.service /lib/systemd/system/nohdmi.service
-	systemctl daemon-reload
-	systemctl enable nohdmi
-
-
-
-
 # mpd
-
-mpd-build: mpd/MPD-$(MPD_VERSION)/src/mpd
 mpd-install: /lib/systemd/system/mpd.service /usr/local/bin/mpd mpd-config ## install mpd
+mpd-build: mpd/MPD-$(MPD_VERSION)/src/mpd
 mpd-config: /etc/mpd.conf /var/lib/mpd /var/run/mpd
 
 /lib/systemd/system/mpd.service: mpd/mpd.service
