@@ -23,6 +23,7 @@ nodesktop: /lib/systemd/system/nohdmi.service  ## remove desktop daemon
 	systemctl disable triggerhappy
 	systemctl disable bluetooth
 	systemctl disable rpi-display-backlight
+	sed -i 's/dtparam=audio=on/dtparam=audio=off/' /boot/config.txt
 
 /lib/systemd/system/nohdmi.service: lib/systemd/system/nohdmi.service
 	cp lib/systemd/system/nohdmi.service /lib/systemd/system/nohdmi.service
@@ -83,6 +84,7 @@ $(MPD_DIRS):
 	@- useradd -r -g audio -s /sbin/nologin mpd || true
 	mkdir -p $(MPD_DIRS)
 	chown mpd:audio $(MPD_DIRS)
+	chmod 777 $(MPD_DIRS)
 
 # vv
 .PHONY: install-vv
