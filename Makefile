@@ -35,13 +35,14 @@ rmdesktop:  ## remove desktop daemon
 
 mpd-build: mpd/MPD-$(MPD_VERSION)/src/mpd
 mpd-install: /lib/systemd/system/mpd.service /usr/local/bin/mpd mpd-config ## install mpd
-mpd-config: /etc/mpd.conf /var/lib/mpd
+mpd-config: /etc/mpd.conf /var/lib/mpd /var/run/mpd
 
 /lib/systemd/system/mpd.service: mpd/mpd.service
 	cp mpd/mpd.service /lib/systemd/system/mpd.service
 
 /usr/local/bin/mpd: mpd/MPD-$(MPD_VERSION)/src/mpd
 	cp mpd/MPD-$(MPD_VERSION)/src/mpd /usr/local/bin/mpd
+	systemctl daemon-reload
 
 mpd/v$(MPD_VERSION).tar.gz:
 	mkdir -p mpd
