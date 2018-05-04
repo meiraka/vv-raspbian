@@ -8,7 +8,7 @@ ARCH=armv6
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-all: noswap nodesktop tmpfs mpd-install  ## execute all target
+all: noswap nodesktop tmpfs install-mpd install-vv  ## execute all target
 
 noswap:  ## remove swap feature && files to reduce sd card r/w access
 	swapoff --all
@@ -21,7 +21,7 @@ nodesktop: /lib/systemd/system/nohdmi.service  ## remove desktop daemon
 	systemctl disable bluetooth
 	systemctl disable rpi-display-backlight
 
-/lib/systemd/system/nohdmi.service:
+/lib/systemd/system/nohdmi.service: lib/systemd/system/nohdmi.service
 	cp lib/systemd/system/nohdmi.service /lib/systemd/system/nohdmi.service
 	systemctl daemon-reload
 	systemctl enable nohdmi
