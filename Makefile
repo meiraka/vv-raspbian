@@ -84,7 +84,7 @@ vv/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz:
 	curl -L https://github.com/meiraka/vv/releases/download/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz -o vv/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz
 
 vv/$(VV_VERSION)/vv: vv/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz
-	tar -xvzf vv/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz -C vv/$(VV_VERSION)
+	tar -mxvzf vv/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz -C vv/$(VV_VERSION)
 
 /usr/local/bin/vv: vv/$(VV_VERSION)/vv
 	cp vv/$(VV_VERSION)/vv /usr/local/bin/vv
