@@ -1,7 +1,7 @@
-ROOT = /
-FSTAB = $(ROOT)etc/fstab
 MPD_VERSION = 0.20.19
 MPD_OPTIONS = "--disable-un --disable-fifo --disable-httpd-output --disable-recorder-output --disable-oss --disable-ipv6 --disable-dsd --disable-libmpdclient --disable-curl --with-systemdsystemunitdir=/lib/systemd/system"
+VV_VERSION = v0.5.6
+ARCH=armv6
 
 .PHONY: help noswap nodesktop tmpfs
  
@@ -27,17 +27,16 @@ nodesktop: /lib/systemd/system/nohdmi.service  ## remove desktop daemon
 	systemctl enable nohdmi
 
 tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w access
-	mkdir -p $(ROOT)etc/tmpfiles.d
-	touch $(FSTAB)
-	grep "/tmp " $(FSTAB) || echo "tmpfs /tmp tmpfs defaults,size=32m,noatime,mode=1777 0 0" >> $(FSTAB)
-	grep "/var/tmp " $(FSTAB) || echo "tmpfs /var/tmp tmpfs defaults,size=16m,noatime,mode=1777 0 0" >> $(FSTAB)
-	grep "/var/log " $(FSTAB) || echo "tmpfs /var/log tmpfs defaults,size=32m,noatime,mode=0755 0 0" >> $(FSTAB)
+	mkdir -p /etc/tmpfiles.d
+	grep "/tmp " /etc/fstab || echo "tmpfs /tmp tmpfs defaults,size=32m,noatime,mode=1777 0 0" >> /etc/fstab
+	grep "/var/tmp " /etc/fstab || echo "tmpfs /var/tmp tmpfs defaults,size=16m,noatime,mode=1777 0 0" >> /etc/fstab
+	grep "/var/log " /etc/fstab || echo "tmpfs /var/log tmpfs defaults,size=32m,noatime,mode=0755 0 0" >> /etc/fstab
 
 /etc/tmpfiles.d/log.conf: etc/tmpfiles.d/log.conf
-	cp etc/tmpfiles.d/log.conf $(ROOT)etc/tmpfiles.d/log.conf
+	cp etc/tmpfiles.d/log.conf /etc/tmpfiles.d/log.conf
 
 # mpd
-mpd-install: /lib/systemd/system/mpd.service /usr/local/bin/mpd mpd-config ## install mpd
+install-mpd: /lib/systemd/system/mpd.service /usr/local/bin/mpd mpd-config ## install mpd
 mpd-build: mpd/MPD-$(MPD_VERSION)/src/mpd
 mpd-config: /etc/mpd.conf /var/lib/mpd /var/run/mpd
 
@@ -75,3 +74,25 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 	@- useradd -r -g audio -s /sbin/nologin mpd || true
 	mkdir -p /var/run/mpd
 	chown mpd:audio /var/run/mpd
+
+# vv
+.PHONY: install-vv
+install-vv: /usr/local/bin/vv /lib/systemd/system/vv.service /etc/xdg/vv/config.yaml  ## install mpd web ui
+
+vv/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz:
+	mkdir -p vv/$(VV_VERSION)
+	curl -L https://github.com/meiraka/vv/releases/download/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz -o vv/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz
+
+vv/$(VV_VERSION)/vv: vv/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz
+	tar -xvzf vv/$(VV_VERSION)/vv-linux-$(ARCH).tar.gz
+
+/usr/local/bin/vv: vv/$(VV_VERSION)/vv
+	cp vv/$(VV_VERSION)/vv /usr/local/bin/vv
+
+/lib/systemd/system/vv.service: lib/systemd/system/vv.service
+	cp lib/systemd/system/vv.service /lib/systemd/system/vv.service
+	systemctl daemon-reload
+	systemctl enable vv
+
+/etc/xdg/vv/config.yaml: etc/xdg/vv/config.yaml
+	cp etc/xdg/vv/config.yaml /etc/xdg/vv/config.yaml

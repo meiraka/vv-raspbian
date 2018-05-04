@@ -1,0 +1,8 @@
+[Unit]
+Description=Web App client for Music Player Daemon
+After=mpd.service
+[Service]
+ExecStart=/usr/local/bin/vv
+
+[Install]
+WantedBy=multi-user.target
