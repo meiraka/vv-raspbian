@@ -31,8 +31,8 @@ all: noswap nodesktop tmpfs install-mpd install-vv  ## execute all target
 
 noswap:  ## remove swap feature && files to reduce sd card r/w access
 	swapoff --all
-	@- systemctl stop dphys-swapfile
-	@- systemctl disable dphys-swapfile
+	@- systemctl stop dphys-swapfile || true
+	@- systemctl disable dphys-swapfile || true
 	rm -fr /var/swap
 
 nodesktop: /lib/systemd/system/nohdmi.service  ## remove desktop daemon
