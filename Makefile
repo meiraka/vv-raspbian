@@ -13,13 +13,16 @@ rmswap:  ## remove swap feature && files to reduce sd card r/w access
 	apt purge -y --auto-remove dphys-swapfile
 	rm -fr /var/swap
 
-tmpfs:  ## make tmpfs for logs to reduce sd card r/w access
+tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w access
 	mkdir -p $(ROOT)etc/tmpfiles.d
 	touch $(FSTAB)
 	grep "/tmp " $(FSTAB) || echo "tmpfs /tmp tmpfs defaults,size=32m,noatime,mode=1777 0 0" >> $(FSTAB)
 	grep "/var/tmp " $(FSTAB) || echo "tmpfs /var/tmp tmpfs defaults,size=16m,noatime,mode=1777 0 0" >> $(FSTAB)
 	grep "/var/log " $(FSTAB) || echo "tmpfs /var/log tmpfs defaults,size=32m,noatime,mode=0755 0 0" >> $(FSTAB)
+
+/etc/tmpfiles.d/log.conf: etc/tmpfiles.d/log.conf
 	cp etc/tmpfiles.d/log.conf $(ROOT)etc/tmpfiles.d/log.conf
+
 
 rmdesktop:  ## remove desktop daemon
 	systemctl disable keyboard-setup
@@ -31,12 +34,14 @@ rmdesktop:  ## remove desktop daemon
 # mpd
 
 mpd-build: mpd/MPD-$(MPD_VERSION)/src/mpd
-mpd-install: /lib/systemd/system/mpd.service mpd-config ## install mpd
+mpd-install: /lib/systemd/system/mpd.service /usr/local/bin/mpd mpd-config ## install mpd
 mpd-config: /etc/mpd.conf /var/lib/mpd
 
-/lib/systemd/system/mpd.service: mpd/mpd.service mpd-build 
-	cd mpd/MPD-$(MPD_VERSION) && make install
+/lib/systemd/system/mpd.service: mpd/mpd.service
 	cp mpd/mpd.service /lib/systemd/system/mpd.service
+
+/usr/local/bin/mpd: mpd/MPD-$(MPD_VERSION)/src/mpd
+	cp mpd/MPD-$(MPD_VERSION)/src/mpd /usr/local/bin/mpd
 
 mpd/v$(MPD_VERSION).tar.gz:
 	mkdir -p mpd
