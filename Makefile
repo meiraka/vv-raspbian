@@ -38,12 +38,7 @@ tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w ac
 # mpd
 install-mpd: /lib/systemd/system/mpd.service /usr/local/bin/mpd mpd-config ## install mpd
 mpd-build: mpd/MPD-$(MPD_VERSION)/src/mpd
-mpd-config: /etc/mpd.conf /var/lib/mpd
-
-/lib/systemd/system/mpd.service: lib/systemd/system/mpd.service
-	cp lib/systemd/system/mpd.service /lib/systemd/system/mpd.service
-	systemctl daemon-reload
-	systemctl enable mpd
+mpd-config: /etc/mpd.conf /var/lib/mpd /etc/tmpfiles.d/mpd.conf
 
 /usr/local/bin/mpd: mpd/MPD-$(MPD_VERSION)/src/mpd
 	cp mpd/MPD-$(MPD_VERSION)/src/mpd /usr/local/bin/mpd
@@ -60,6 +55,11 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 	cd mpd/MPD-$(MPD_VERSION) && ./autogen.sh
 	cd mpd/MPD-$(MPD_VERSION) && ./configure $(MPD_OPTIONS)
 
+/lib/systemd/system/mpd.service: lib/systemd/system/mpd.service
+	cp lib/systemd/system/mpd.service /lib/systemd/system/mpd.service
+	systemctl daemon-reload
+	systemctl enable mpd
+
 /etc/mpd.conf: etc/mpd.conf
 	@- useradd -r -g audio -s /sbin/nologin mpd || true
 	cp etc/mpd.conf /etc/mpd.conf
@@ -69,6 +69,9 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 	@- useradd -r -g audio -s /sbin/nologin mpd || true
 	mkdir -p /var/lib/mpd
 	chown mpd:audio /var/lib/mpd
+
+/etc/tmpfiles.d/mpd.conf: etc/tmpfiles.d/mpd.conf
+	cp etc/tmpfiles.d/mpd.conf /etc/tmpfiles.d/mpd.conf
 
 # vv
 .PHONY: install-vv
