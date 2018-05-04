@@ -31,12 +31,12 @@ rmdesktop:  ## remove desktop daemon
 # mpd
 
 mpd-build: mpd/MPD-$(MPD_VERSION)/src/mpd
-
-.PHONY: mpd-install mpd-config
-mpd-install: mpd-build mpd-config  ## install mpd
-	cd mpd/MPD-$(MPD_VERSION) && make install
-
+mpd-install: /lib/systemd/system/mpd.service mpd-config ## install mpd
 mpd-config: /etc/mpd.conf /var/lib/mpd
+
+/lib/systemd/system/mpd.service: mpd/mpd.service mpd-build 
+	cd mpd/MPD-$(MPD_VERSION) && make install
+	cp mpd/mpd.service /lib/systemd/system/mpd.service
 
 mpd/v$(MPD_VERSION).tar.gz:
 	mkdir -p mpd
