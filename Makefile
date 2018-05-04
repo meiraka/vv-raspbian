@@ -38,7 +38,7 @@ tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w ac
 # mpd
 install-mpd: /lib/systemd/system/mpd.service /usr/local/bin/mpd mpd-config ## install mpd
 mpd-build: mpd/MPD-$(MPD_VERSION)/src/mpd
-mpd-config: /etc/mpd.conf /var/lib/mpd /var/run/mpd
+mpd-config: /etc/mpd.conf /var/lib/mpd
 
 /lib/systemd/system/mpd.service: lib/systemd/system/mpd.service
 	cp lib/systemd/system/mpd.service /lib/systemd/system/mpd.service
@@ -69,11 +69,6 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 	@- useradd -r -g audio -s /sbin/nologin mpd || true
 	mkdir -p /var/lib/mpd
 	chown mpd:audio /var/lib/mpd
-
-/var/run/mpd:
-	@- useradd -r -g audio -s /sbin/nologin mpd || true
-	mkdir -p /var/run/mpd
-	chown mpd:audio /var/run/mpd
 
 # vv
 .PHONY: install-vv
