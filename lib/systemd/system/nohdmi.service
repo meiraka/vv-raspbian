@@ -1,0 +1,9 @@
+[Unit]
+Description=Disable HDMI Output
+
+[Service]
+ExecStart=tvservice -o
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
