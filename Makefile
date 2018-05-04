@@ -40,8 +40,8 @@ install-mpd: /lib/systemd/system/mpd.service /usr/local/bin/mpd mpd-config ## in
 mpd-build: mpd/MPD-$(MPD_VERSION)/src/mpd
 mpd-config: /etc/mpd.conf /var/lib/mpd /var/run/mpd
 
-/lib/systemd/system/mpd.service: mpd/mpd.service
-	cp mpd/mpd.service /lib/systemd/system/mpd.service
+/lib/systemd/system/mpd.service: lib/systemd/system/mpd.service
+	cp lib/systemd/system/mpd.service /lib/systemd/system/mpd.service
 	systemctl daemon-reload
 	systemctl enable mpd
 
@@ -53,16 +53,16 @@ mpd/v$(MPD_VERSION).tar.gz:
 	cd mpd && wget https://github.com/MusicPlayerDaemon/MPD/archive/v$(MPD_VERSION).tar.gz
 
 mpd/MPD-$(MPD_VERSION): mpd/v$(MPD_VERSION).tar.gz
-	cd mpd && tar -xvzf v$(MPD_VERSION).tar.gz
+	cd mpd && tar -mxvzf v$(MPD_VERSION).tar.gz
 
 mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 	apt install -y build-essential automake libid3tag0-dev libflac-dev libvorbis-dev libsndfile1-dev libboost-dev libicu-dev libsqlite3-dev libsystemd-dev libglib2.0-dev libmms-dev libmpdclient-dev libpostproc-dev libavutil-dev libavcodec-dev libavformat-dev libnfs-dev libsmbclient-dev libsoxr-dev libasound2-dev libmpg123-dev
 	cd mpd/MPD-$(MPD_VERSION) && ./autogen.sh
 	cd mpd/MPD-$(MPD_VERSION) && ./configure $(MPD_OPTIONS)
 
-/etc/mpd.conf:
+/etc/mpd.conf: etc/mpd.conf
 	@- useradd -r -g audio -s /sbin/nologin mpd || true
-	cp mpd/mpd.conf /etc/mpd.conf
+	cp etc/mpd.conf /etc/mpd.conf
 	chown mpd:audio /etc/mpd.conf
 
 /var/lib/mpd:
