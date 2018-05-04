@@ -39,24 +39,28 @@ tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w ac
 	cp etc/tmpfiles.d/log.conf /etc/tmpfiles.d/log.conf
 
 # mpd
-install-mpd: /lib/systemd/system/mpd.service /usr/local/bin/mpd mpd-config ## install mpd
-mpd-build: mpd/MPD-$(MPD_VERSION)/src/mpd
-mpd-config: /etc/mpd.conf /var/lib/mpd /var/lib/mpd/tag_cache /var/lib/mpd/playlists /etc/tmpfiles.d/mpd.conf
+install-mpd: /usr/local/bin/mpd mpd-config mpd-dir ## install mpd
+mpd-config: /lib/systemd/system/mpd.service /etc/mpd.conf /etc/tmpfiles.d/mpd.conf
+mpd-dir: /var/lib/mpd /var/lib/mpd/tag_cache /var/lib/mpd/playlists
 
-/usr/local/bin/mpd: mpd/MPD-$(MPD_VERSION)/src/mpd
-	cp mpd/MPD-$(MPD_VERSION)/src/mpd /usr/local/bin/mpd
-
+# mpd fetch
 mpd/v$(MPD_VERSION).tar.gz:
 	mkdir -p mpd
 	cd mpd && wget https://github.com/MusicPlayerDaemon/MPD/archive/v$(MPD_VERSION).tar.gz
 
+# mpd extract
 mpd/MPD-$(MPD_VERSION): mpd/v$(MPD_VERSION).tar.gz
 	cd mpd && tar -mxvzf v$(MPD_VERSION).tar.gz
 
+# mpd build
 mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 	apt install -y $(MPD_DEP)
 	cd mpd/MPD-$(MPD_VERSION) && ./autogen.sh
 	cd mpd/MPD-$(MPD_VERSION) && ./configure $(MPD_OPTIONS)
+
+# mpd copy binary
+/usr/local/bin/mpd: mpd/MPD-$(MPD_VERSION)/src/mpd
+	cp mpd/MPD-$(MPD_VERSION)/src/mpd /usr/local/bin/mpd
 
 /lib/systemd/system/mpd.service: lib/systemd/system/mpd.service
 	cp lib/systemd/system/mpd.service /lib/systemd/system/mpd.service
@@ -67,6 +71,9 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 	@- useradd -r -g audio -s /sbin/nologin mpd || true
 	cp etc/mpd.conf /etc/mpd.conf
 	chown mpd:audio /etc/mpd.conf
+
+/etc/tmpfiles.d/mpd.conf: etc/tmpfiles.d/mpd.conf
+	cp etc/tmpfiles.d/mpd.conf /etc/tmpfiles.d/mpd.conf
 
 /var/lib/mpd:
 	@- useradd -r -g audio -s /sbin/nologin mpd || true
@@ -80,9 +87,6 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 /var/lib/mpd/tag_cache: /var/lib/mpd
 	mkdir -p /var/lib/mpd/tag_cache
 	chown mpd:audio /var/lib/mpd/tag_cache
-
-/etc/tmpfiles.d/mpd.conf: etc/tmpfiles.d/mpd.conf
-	cp etc/tmpfiles.d/mpd.conf /etc/tmpfiles.d/mpd.conf
 
 # vv
 .PHONY: install-vv
