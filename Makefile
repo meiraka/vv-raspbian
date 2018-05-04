@@ -1,31 +1,14 @@
 MPD_VERSION = 0.20.19
-MPD_OPTIONS = "--disable-un --disable-fifo --disable-httpd-output --disable-recorder-output --disable-oss --disable-ipv6 --disable-dsd --disable-libmpdclient --disable-curl --with-systemdsystemunitdir=/lib/systemd/system"
+MPD_OPTIONS = --disable-un --disable-fifo --disable-httpd-output --disable-recorder-output --disable-oss --disable-ipv6 --disable-dsd --disable-libmpdclient --disable-curl --with-systemdsystemunitdir=/lib/systemd/system
+MPD_DEP = build-essential automake libid3tag0-dev libflac-dev libvorbis-dev libsndfile1-dev libboost-dev libicu-dev libsqlite3-dev libsystemd-dev libglib2.0-dev libmms-dev libmpdclient-dev libpostproc-dev libavutil-dev libavcodec-dev libavformat-dev libnfs-dev libsmbclient-dev libsoxr-dev libasound2-dev libmpg123-dev
 VV_VERSION = v0.5.6
 ARCH=armv6
 
-APT_INSTALL = "build-essential automake "
-APT_INSTALL+= "libid3tag0-dev libflac-dev libvorbis-dev libsndfile1-dev libboost-dev libicu-dev libsqlite3-dev libsystemd-dev libglib2.0-dev libmms-dev libmpdclient-dev libpostproc-dev libavutil-dev libavcodec-dev libavformat-dev libnfs-dev libsmbclient-dev libsoxr-dev libasound2-dev libmpg123-dev"
 
-.PHONY: help noswap nodesktop tmpfs apt-install
+.PHONY: help noswap nodesktop tmpfs
  
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
-
-apt-install:
-	@LIST="$(APT_INSTALL)";\
-        if /usr/bin/which apt > /dev/null; then\
-		INSTALL_PKGS=;\
-        for x in $$LIST; do\
-		if dpkg -l "$$x" | grep ii > /dev/null; then\
-		echo installed "$$x";\
-		else\
-        INSTALL_PKGS="$$INSTALL_PKGS $$x";\
-		fi\
-		done;\
-        if [ "$$INSTALL_PKGS" != "" ]; then\
-        sudo apt install $$INSTALL_PKGS -y;\
-        fi\
-        fi\
 
 all: noswap nodesktop tmpfs install-mpd install-vv  ## execute all target
 
@@ -70,7 +53,8 @@ mpd/v$(MPD_VERSION).tar.gz:
 mpd/MPD-$(MPD_VERSION): mpd/v$(MPD_VERSION).tar.gz
 	cd mpd && tar -mxvzf v$(MPD_VERSION).tar.gz
 
-mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION) apt-install
+mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
+	apt install -y $(MPD_DEP)
 	cd mpd/MPD-$(MPD_VERSION) && ./autogen.sh
 	cd mpd/MPD-$(MPD_VERSION) && ./configure $(MPD_OPTIONS)
 
