@@ -37,7 +37,6 @@ mpd-install: mpd-build mpd-config  ## install mpd
 	cd mpd/MPD-$(MPD_VERSION) && make install
 
 mpd-config: /etc/mpd.conf /var/lib/mpd
-	sudo useradd -r -g audio -s /sbin/nologin mpd
 
 mpd/v$(MPD_VERSION).tar.gz:
 	mkdir -p mpd
@@ -55,5 +54,6 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 	cp mpd/mpd.conf /etc/mpd.conf
 
 /var/lib/mpd:
+	useradd -r -g audio -s /sbin/nologin mpd
 	mkdir -p /var/lib/mpd
 	chown mpd:audio /var/lib/mpd
