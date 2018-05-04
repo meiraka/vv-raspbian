@@ -64,3 +64,8 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 	@- useradd -r -g audio -s /sbin/nologin mpd || true
 	mkdir -p /var/lib/mpd
 	chown mpd:audio /var/lib/mpd
+
+/var/run/mpd:
+	@- useradd -r -g audio -s /sbin/nologin mpd || true
+	mkdir -p /var/run/mpd
+	chown mpd:audio /var/run/mpd
