@@ -57,6 +57,8 @@ mpd/MPD-$(MPD_VERSION)/src/mpd: mpd/MPD-$(MPD_VERSION)
 	apt install -y $(MPD_DEP)
 	cd mpd/MPD-$(MPD_VERSION) && ./autogen.sh
 	cd mpd/MPD-$(MPD_VERSION) && ./configure $(MPD_OPTIONS)
+	cd mpd/MPD-$(MPD_VERSION) && make
+	touch mpd/MPD-$(MPD_VERSION)/src/mpd
 
 # mpd copy binary
 /usr/local/bin/mpd: mpd/MPD-$(MPD_VERSION)/src/mpd
