@@ -5,20 +5,20 @@ VV_VERSION = v0.5.6
 ARCH=armv6
 
 
-.PHONY: help noswap nodesktop tmpfs
+.PHONY: help noswap nodesktop nobt tmpfs weak-wlan
  
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-all: noswap nodesktop tmpfs weak-wlan install-mpd install-vv install-mpd-sync  ## execute all target
+all: noswap nodesktop nobt tmpfs weak-wlan install-mpd install-vv install-mpd-sync  ## execute all target
 
-noswap:  ## remove swap feature && files to reduce sd card r/w access
+noswap:  ## stop swap feature && remove files to reduce sd card r/w access
 	swapoff --all
 	@- systemctl stop dphys-swapfile || true
 	@- systemctl disable dphys-swapfile || true
 	rm -fr /var/swap
 
-nodesktop: /lib/systemd/system/nohdmi.service  ## remove desktop daemon
+nodesktop: /lib/systemd/system/nohdmi.service  ## stop desktop service
 	systemctl disable keyboard-setup
 	systemctl disable triggerhappy
 	systemctl disable bluetooth
@@ -30,6 +30,10 @@ nodesktop: /lib/systemd/system/nohdmi.service  ## remove desktop daemon
 	systemctl daemon-reload
 	systemctl enable nohdmi
 
+nobt:  ## stop bluetooth
+	- systemctl disable hciuart
+	- systemctl disable bluetooth
+
 tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w access
 	mkdir -p /etc/tmpfiles.d
 	grep "/tmp " /etc/fstab || echo "tmpfs /tmp tmpfs defaults,size=32m,noatime,mode=1777 0 0" >> /etc/fstab
@@ -39,7 +43,7 @@ tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w ac
 /etc/tmpfiles.d/log.conf: etc/tmpfiles.d/log.conf
 	cp etc/tmpfiles.d/log.conf /etc/tmpfiles.d/log.conf
 
-weak-wlan:
+weak-wlan:  ## reduce wifi power
 	grep "wireless-txpower 0" /etc/network/interfaces || echo "wireless-txpower 0" >> /etc/network/interfaces
 
 # mpd
