@@ -1,8 +1,0 @@
-[Unit]
-Description=mpd disk sync
-After=mpd.service
-[Service]
-ExecStart=/usr/local/bin/mpd-sync
-
-[Install]
-WantedBy=multi-user.target
