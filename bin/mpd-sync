@@ -13,6 +13,7 @@ class App(object):
 
     def exit(self, signum, frame):
         self.running = False
+        subprocess.check_output('sync', shell=True)
         with open('/sys/class/leds/led0/trigger', 'w') as f:
             f.write("mmc0")
         sys.exit(0)
