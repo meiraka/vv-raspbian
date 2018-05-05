@@ -2,7 +2,7 @@
 Description=Disable HDMI Output
 
 [Service]
-ExecStart=tvservice -o
+ExecStart=/usr/bin/tvservice -o
 Type=oneshot
 
 [Install]
