@@ -91,7 +91,7 @@ $(MPD_DIRS):
 install-mpd-sync: /usr/local/bin/mpd-sync /lib/systemd/system/mpd-sync.service  ## install mpd disk sync daemon
 
 /usr/local/bin/mpd-sync: bin/mpd-sync
-	cp bin/mpd-sync /usr/local/bin/mpd-sync:
+	cp bin/mpd-sync /usr/local/bin/mpd-sync
 	chmod 755 /usr/local/bin/mpd-sync
 
 /lib/systemd/system/mpd-sync.service: lib/systemd/system/mpd-sync.service
