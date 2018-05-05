@@ -5,12 +5,12 @@ VV_VERSION = v0.5.6
 ARCH=armv6
 
 
-.PHONY: help noswap nodesktop nobt tmpfs weak-wlan
+.PHONY: help noswap nodesktop nobt tmpfs ext4interval weak-wlan
  
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-all: noswap nodesktop nobt tmpfs weak-wlan install-mpd install-vv install-mpd-sync  ## execute all target
+all: noswap nodesktop nobt tmpfs ext4interval weak-wlan install-mpd install-vv ## execute all target
 
 noswap:  ## stop swap feature && remove files to reduce sd card r/w access
 	swapoff --all
@@ -42,6 +42,9 @@ tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w ac
 
 /etc/tmpfiles.d/log.conf: etc/tmpfiles.d/log.conf
 	cp etc/tmpfiles.d/log.conf /etc/tmpfiles.d/log.conf
+
+ext4interval:  ## extend ext4 commit interval from 30 to 290
+	sed -i 's/ext4\s\+defaults,noatime\s\+/ext4 defaults,noatime,commit=290 /' /etc/fstab
 
 weak-wlan:  ## reduce wifi power
 	grep "wireless-txpower 0" /etc/network/interfaces || echo "wireless-txpower 0" >> /etc/network/interfaces
@@ -92,19 +95,6 @@ $(MPD_DIRS):
 	mkdir -p $(MPD_DIRS)
 	chown mpd:audio $(MPD_DIRS)
 	chmod 777 $(MPD_DIRS)
-
-# mpd-sync
-.PHONY: install-mpd-sync
-install-mpd-sync: /usr/local/bin/mpd-sync /lib/systemd/system/mpd-sync.service  ## install mpd disk sync daemon
-
-/usr/local/bin/mpd-sync: bin/mpd-sync
-	cp bin/mpd-sync /usr/local/bin/mpd-sync
-	chmod 755 /usr/local/bin/mpd-sync
-
-/lib/systemd/system/mpd-sync.service: lib/systemd/system/mpd-sync.service
-	cp lib/systemd/system/mpd-sync.service /lib/systemd/system/mpd-sync.service
-	systemctl daemon-reload
-	systemctl enable mpd-sync
 
 # vv
 .PHONY: install-vv
