@@ -1,7 +1,7 @@
 MPD_VERSION = 0.20.19
 MPD_OPTIONS = --disable-un --disable-fifo --disable-httpd-output --disable-recorder-output --disable-oss --disable-ipv6 --disable-dsd --disable-libmpdclient --disable-curl --with-systemdsystemunitdir=/lib/systemd/system
 MPD_DEP = build-essential automake libid3tag0-dev libflac-dev libvorbis-dev libsndfile1-dev libboost-dev libicu-dev libsqlite3-dev libsystemd-dev libglib2.0-dev libmms-dev libmpdclient-dev libpostproc-dev libavutil-dev libavcodec-dev libavformat-dev libnfs-dev libsmbclient-dev libsoxr-dev libasound2-dev libmpg123-dev
-VV_VERSION = v0.5.6
+VV_VERSION = v0.6.1
 ARCH=armv6
 
 
@@ -35,7 +35,6 @@ nobt:  ## stop bluetooth
 	- systemctl disable bluetooth
 
 tmpfs: /etc/tmpfiles.d/log.conf  ## make tmpfs for logs to reduce sd card r/w access
-	mkdir -p /etc/tmpfiles.d
 	grep "/tmp " /etc/fstab || echo "tmpfs /tmp tmpfs defaults,size=32m,noatime,mode=1777 0 0" >> /etc/fstab
 	grep "/var/tmp " /etc/fstab || echo "tmpfs /var/tmp tmpfs defaults,size=16m,noatime,mode=1777 0 0" >> /etc/fstab
 	grep "/var/log " /etc/fstab || echo "tmpfs /var/log tmpfs defaults,size=32m,noatime,mode=0755 0 0" >> /etc/fstab
