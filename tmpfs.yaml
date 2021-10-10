@@ -1,0 +1,28 @@
+---
+
+- name: setup tmpfs
+  gather_facts: no
+  hosts: all
+  become: yes
+  tasks:
+  - name: mount tmpfs
+    ansible.posix.mount:
+      path: "{{ item.path }}"
+      src: tmpfs
+      fstype: tmpfs
+      opts: "{{ item.opts }}"
+      state: present
+    with_items:
+    - { path: /tmp, opts: 'defaults,noatime,nosuid,nodev,noexec,mode=0755,size=10M' }
+    - { path: /var/tmp, opts: 'defaults,noatime,nosuid,nodev,noexec,mode=0755,size=1M' }
+    - { path: /var/log, opts: 'defaults,noatime,nosuid,nodev,noexec,mode=0755,size=200M' }
+
+  - name: create mpd dir
+    ansible.builtin.copy:
+      src: mpd-tmpfiles.conf
+      dest: /etc/tmpfiles.d/tmpfiles-mpd.conf
+      mode: '0755'
+
+
+
+

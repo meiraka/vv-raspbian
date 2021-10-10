@@ -1,0 +1,29 @@
+max_output_buffer_size "262144"
+music_directory        "/var/lib/mpd/music"
+playlist_directory     "/var/lib/mpd/playlists"
+sticker_file           "/var/lib/mpd/sticker.sql"
+log_file               "/var/log/mpd/mpd.log"
+
+user                   "nobody"
+#bind_to_address        "any"
+#port                   "6600"
+bind_to_address        "/run/mpd/socket"
+
+database {
+  plugin               "simple"
+  path                 "/var/lib/mpd/db"
+  cache_directory      "/var/lib/mpd/cache"
+}
+
+audio_output {
+  type                 "alsa"
+  name                 "My ALSA Device"
+  device               "hw:0,0" # optional
+  mixer_type           "software" # optional
+#  mixer_device         "default" # optional
+#  mixer_control        "PCM" # optional
+#  mixer_index          "0" # optional
+}
+
+filesystem_charset     "UTF-8"
+
