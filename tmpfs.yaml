@@ -19,7 +19,7 @@
 
   - name: create mpd dir
     ansible.builtin.copy:
-      src: mpd-tmpfiles.conf
+      src: tmpfs/mpd-tmpfiles.conf
       dest: /etc/tmpfiles.d/tmpfiles-mpd.conf
       mode: '0755'
 
