@@ -134,7 +134,7 @@
   - name: create default mpd conf
     ansible.builtin.copy:
       force: no
-      src: mpd.conf.default
+      src: mpd/mpd.conf.default
       dest: /usr/local/etc/mpd.conf
       mode: '0644'
       owner: root
