@@ -2,6 +2,7 @@
 
 
 - name: install mpd
+  gather_facts: no
   hosts: all
   become: yes
   tasks:
@@ -113,13 +114,19 @@
       path: /usr/local/lib/systemd/system/mpd.service
       regexp: '^After=network.target'
       line: 'After=network.target sound.target mnt-wibble.mount'
+  - name: create mpd user
+    ansible.builtin.user:
+      name: mpd
+      shell: /sbin/nologin
+      uid: 122
+      group: audio
   - name: create default mpd directory
     ansible.builtin.file:
       path: "{{ item }}"
       state: directory
       mode: '0755'
-      owner: nobody
-      group: nogroup
+      owner: mpd
+      group: audio
     loop:
     - /var/lib/mpd
     - /var/log/mpd

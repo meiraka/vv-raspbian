@@ -3,3 +3,4 @@ music.local
 
 [all:vars]
 mpd_version=0.22.11
+vv_version=v0.11.1
