@@ -2,7 +2,6 @@
 
 
 - name: install mpd
-  gather_facts: no
   hosts: all
   become: yes
   tasks:
@@ -89,23 +88,24 @@
       argv:
       - meson
       - .
-      - output/release
+      - output/{{ ansible_architecture }}
+      - --sysconfdir=/etc
       - --buildtype=debugoptimized
       -  -Db_ndebug=true
-      creates: /usr/local/src/mpd/mpd-{{ mpd_version }}/output/release
+      creates: /usr/local/src/mpd/mpd-{{ mpd_version }}/output/{{ ansible_architecture }}
   - name: build
     ansible.builtin.command:
       chdir: /usr/local/src/mpd/mpd-{{ mpd_version }}
       argv:
       - ninja
       - -C
-      - output/release
+      - output/{{ ansible_architecture }}
       - -j
       - '1'
-      creates: /usr/local/src/mpd/mpd-{{ mpd_version }}/output/release/mpd
+      creates: /usr/local/src/mpd/mpd-{{ mpd_version }}/output/{{ ansible_architecture }}/mpd
   - name: configure starts after mount
     ansible.builtin.lineinfile:
-      path: "/usr/local/src/mpd/mpd-{{ mpd_version }}/output/release/systemd/system/mpd.service"
+      path: "/usr/local/src/mpd/mpd-{{ mpd_version }}/output/{{ ansible_architecture }}/systemd/system/mpd.service"
       regexp: '^After=network.target'
       line: 'After=network.target sound.target mnt-wibble.mount'
   - name: install dir
@@ -129,10 +129,10 @@
       owner: root
       group: root
     with_items:
-    - src: "output/release/mpd"
+    - src: "output/{{ ansible_architecture }}/mpd"
       dest: /usr/local/bin/mpd
       mode: '0751'
-    - src: "output/release/systemd/system/mpd.service"
+    - src: "output/{{ ansible_architecture }}/systemd/system/mpd.service"
       dest: /usr/local/lib/systemd/system/mpd.service
       mode: '0644'
     - src: "systemd/system/mpd.socket"
@@ -162,11 +162,14 @@
   - name: create conf
     ansible.builtin.copy:
       force: no
-      src: mpd/mpd.conf.default
-      dest: /usr/local/etc/mpd.conf
+      src: "mpd/{{ item }}"
+      dest: "/etc/{{ item }}"
       mode: '0644'
       owner: root
       group: root
+    with_items:
+    - mpd.conf
+    - mpd.output.conf
   - name: flush handlers
     meta: flush_handlers
   - name: enable

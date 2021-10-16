@@ -33,16 +33,18 @@
     - reboot
   - name: create mpd conf
     ansible.builtin.copy:
-      src: rpi/mpd.output.config
-      dest: /usr/local/etc/mpd.output.conf
+      src: rpi/mpd.output.conf
+      dest: /etc/mpd.output.conf
       mode: '0644'
       owner: root
       group: root
+    notify:
+    - restart mpd
   - name: include mpd conf
     ansible.builtin.lineinfile:
-      path: /usr/local/etc/mpd.conf
-      regexp: 'include "/usr/local/etc/mpd.output.conf"'
-      line: 'include "/usr/local/etc/mpd.output.conf"'
+      path: /etc/mpd.conf
+      regexp: 'include "/etc/mpd.output.conf"'
+      line: 'include "/etc/mpd.output.conf"'
     notify:
     - restart mpd
   handlers:
