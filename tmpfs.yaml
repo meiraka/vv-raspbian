@@ -22,7 +22,3 @@
       src: tmpfs/mpd-tmpfiles.conf
       dest: /etc/tmpfiles.d/tmpfiles-mpd.conf
       mode: '0755'
-
-
-
-
