@@ -15,7 +15,7 @@
       path: "{{ item }}"
       state: directory
       mode: '0755'
-    with_items:
+    loop:
     - /usr/local/src/vv
     - /usr/local/src/vv/vv-{{ vv_version }}
   - name: fetch binary
@@ -33,7 +33,7 @@
       path: "{{ item }}"
       state: directory
       mode: '0755'
-    with_items:
+    loop:
     - /etc/xdg/vv
   - name: install
     ansible.builtin.copy:
@@ -52,7 +52,7 @@
       owner: root
       group: root
       mode: '0755'
-    with_items:
+    loop:
     - src: vv/vv.service
       dest: /usr/local/lib/systemd/system/vv.service
     - src: vv/config.yaml

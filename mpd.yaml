@@ -115,7 +115,7 @@
       mode: "{{ item.mode }}"
       owner: root
       group: root
-    with_items:
+    loop:
     - path: /usr/local/bin
       mode: '0755'
     - path: /usr/local/systemd/system
@@ -128,7 +128,7 @@
       mode: "{{ item.mode }}"
       owner: root
       group: root
-    with_items:
+    loop:
     - src: "output/{{ ansible_architecture }}/mpd"
       dest: /usr/local/bin/mpd
       mode: '0751'
@@ -167,7 +167,7 @@
       mode: '0644'
       owner: root
       group: root
-    with_items:
+    loop:
     - mpd.conf
     - mpd.output.conf
   - name: flush handlers

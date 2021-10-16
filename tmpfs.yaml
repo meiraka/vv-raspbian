@@ -12,7 +12,7 @@
       fstype: tmpfs
       opts: "{{ item.opts }}"
       state: present
-    with_items:
+    loop:
     - { path: /tmp, opts: 'defaults,noatime,nosuid,nodev,noexec,mode=0755,size=10M' }
     - { path: /var/tmp, opts: 'defaults,noatime,nosuid,nodev,noexec,mode=0755,size=1M' }
     - { path: /var/log, opts: 'defaults,noatime,nosuid,nodev,noexec,mode=0755,size=200M' }

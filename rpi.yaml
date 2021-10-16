@@ -10,7 +10,7 @@
       dest: "{{ boot_config_txt | default('/boot/config.txt') }}"
       regexp: "{{ item.regexp }}"
       replace: "{{ item.replace }}"
-    with_items:
+    loop:
     - regexp: '^ *dtoverlay=(?!hifiberry-dacplus)'
       replace: '# dtoverlay='
     - regexp: '^ *dtparam=audio=on'
@@ -22,7 +22,7 @@
       path: "{{ boot_config_txt | default('/boot/config.txt') }}"
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
-    with_items:
+    loop:
     - regexp: 'dtparam=i2c_arm'
       line: 'dtparam=i2c_arm=on'
     - regexp: 'dtparam=i2s'
