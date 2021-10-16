@@ -1,0 +1,11 @@
+mpd:
+  network: "unix"
+  addr: "/run/mpd/socket"
+  conf: "/usr/local/etc/mpd.conf"
+  binarylimit: 128 KiB
+
+server:
+  addr: ":80"
+  cache_directory: "/tmp/vv"
+  local: true
+  remote: false
