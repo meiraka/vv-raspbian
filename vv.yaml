@@ -1,0 +1,74 @@
+---
+
+- name: install vv
+  hosts: all
+  become: yes
+  vars:
+    platforms:
+      x86_64: amd64
+      armv7l: armv7
+      armv6l: armv6
+      aarch64: arm64
+  tasks:
+  - name: create working dir
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      mode: '0755'
+    with_items:
+    - /usr/local/src/vv
+    - /usr/local/src/vv/vv-{{ vv_version }}
+  - name: fetch binary
+    ansible.builtin.get_url:
+      url: https://github.com/meiraka/vv/releases/download/{{ vv_version }}/vv-linux-{{ platforms[ansible_architecture] }}.tar.gz
+      dest: /usr/local/src/vv/vv-{{ vv_version }}.tar.xz
+  - name: extract
+    ansible.builtin.unarchive:
+      src: /usr/local/src/vv/vv-{{ vv_version }}.tar.xz
+      remote_src: yes
+      dest: /usr/local/src/vv/vv-{{ vv_version }}
+      creates: /usr/local/src/vv/vv-{{ vv_version }}/vv
+  - name: create config dir
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      mode: '0755'
+    with_items:
+    - /etc/xdg/vv
+  - name: install
+    ansible.builtin.copy:
+      src: /usr/local/src/vv/vv-{{ vv_version }}/vv
+      dest: /usr/local/bin/vv
+      remote_src: yes
+      owner: root
+      group: root
+      mode: '0755'
+    notify:
+    - restart
+  - name: install config
+    ansible.builtin.copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      owner: root
+      group: root
+      mode: '0755'
+    with_items:
+    - src: vv/vv.service
+      dest: /usr/local/lib/systemd/system/vv.service
+    - src: vv/config.yaml
+      dest: /etc/xdg/vv/config.yaml
+    notify:
+    - restart
+  - name: flush handlers
+    meta: flush_handlers
+  - name: start
+    ansible.builtin.systemd:
+      name: vv
+      state: started
+      enabled: yes
+  handlers:
+  - name: restart
+    ansible.builtin.systemd:
+      name: vv
+      state: restarted
+      daemon_reload: yes
