@@ -1,0 +1,44 @@
+---
+
+- name: setup rpi audio config
+  gather_facts: no
+  hosts: all
+  become: yes
+  tasks:
+  - name: turn off dtoverlay
+    ansible.builtin.replace:
+      dest: "{{ boot_config_txt | default('/boot/config.txt') }}"
+      regexp: '^ *dtoverlay=(?!hifiberry-dacplus)'
+      replace: '# dtoverlay='
+  - name: "enable SB32+PRO DoP"
+    ansible.builtin.lineinfile:
+      path: "{{ boot_config_txt | default('/boot/config.txt') }}"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    with_items:
+    - regexp: 'dtparam=i2c_arm'
+      line: 'dtparam=i2c_arm=on'
+    - regexp: 'dtparam=i2s'
+      line: 'dtparam=i2s=on'
+    - regexp: '^ *dtoverlay='
+      line: 'dtoverlay=hifiberry-dacplus'
+  - name: create mpd conf
+    ansible.builtin.copy:
+      src: rpi/mpd.output.config
+      dest: /usr/local/etc/mpd.output.conf
+      mode: '0644'
+      owner: root
+      group: root
+  - name: include mpd conf
+    ansible.builtin.lineinfile:
+      path: /usr/local/etc/mpd.conf
+      regexp: 'include "/usr/local/etc/mpd.output.conf"'
+      line: 'include "/usr/local/etc/mpd.output.conf"'
+    notify:
+    - restart mpd
+  handlers:
+  - name: restart mpd
+    ansible.builtin.systemd:
+      name: mpd
+      state: restarted
+      daemon_reload: yes
