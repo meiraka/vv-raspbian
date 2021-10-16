@@ -155,6 +155,8 @@
       group: audio
     loop:
     - /var/lib/mpd
+    - /var/lib/mpd/music
+    - /var/lib/mpd/playlists
     - /var/log/mpd
     - /run/mpd
   - name: create conf
