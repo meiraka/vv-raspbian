@@ -1,0 +1,10 @@
+dtoverlay=disable-bt
+dtoverlay=disable-wifi
+
+dtparam=i2c_arm=on
+dtparam=i2s=on
+dtoverlay=hifiberry-dacplus
+
+# dtoverlay=gpio-shutdown,gpio_pin=8
+
+start_x=0

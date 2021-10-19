@@ -5,30 +5,13 @@
   hosts: all
   become: yes
   tasks:
-  - name: turn off
-    ansible.builtin.replace:
-      dest: "{{ boot_config_txt | default('/boot/config.txt') }}"
-      regexp: "{{ item.regexp }}"
-      replace: "{{ item.replace }}"
-    loop:
-    - regexp: '^ *dtoverlay=(?!hifiberry-dacplus)'
-      replace: '# dtoverlay='
-    - regexp: '^ *dtparam=audio=on'
-      replace: '# dtparam=audio=on'
-    notify:
-    - reboot
-  - name: "enable SB32+PRO DoP"
-    ansible.builtin.lineinfile:
-      path: "{{ boot_config_txt | default('/boot/config.txt') }}"
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-    loop:
-    - regexp: 'dtparam=i2c_arm'
-      line: 'dtparam=i2c_arm=on'
-    - regexp: 'dtparam=i2s'
-      line: 'dtparam=i2s=on'
-    - regexp: '^ *dtoverlay='
-      line: 'dtoverlay=hifiberry-dacplus'
+  - name: setup /boot/config.txt
+    ansible.builtin.copy:
+      src: rpi/config.txt
+      dest: /boot/config.txt
+      mode: '0751'
+      owner: root
+      group: root
     notify:
     - reboot
   - name: create mpd conf
