@@ -23,6 +23,16 @@
       group: root
     notify:
     - reboot
+  - name: stop unused services for audio
+    ansible.builtin.systemd:
+      name: '{{ item }}'
+      state: stopped
+      enabled: no
+    loop:
+    - keyboard-setup # keyboard layout
+    - dphys-swapfile # swap
+    - triggerhappy   # hotkey
+    - wpa_supplicant # wifi
   - name: set rpi sysctl
     ansible.builtin.copy:
       src: rpi/rpi.sysctl.conf
@@ -48,6 +58,13 @@
       line: 'include "/etc/mpd.output.conf"'
     notify:
     - restart mpd
+  - name: use google dns
+    ansible.builtin.lineinfile:
+      path: /etc/dhcpcd.conf
+      regexp: 'static domain_name_servers='
+      line: 'static domain_name_servers=8.8.8.8 8.8.4.4'
+    notify:
+    - reboot
   handlers:
   - name: reboot
     ansible.builtin.reboot:
