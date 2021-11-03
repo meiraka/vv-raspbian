@@ -1,9 +1,10 @@
-dtoverlay=disable-bt
-dtoverlay=disable-wifi
-
 dtparam=i2c_arm=on
 dtparam=i2s=on
+dtparam=act_led_trigger=default-on
 dtoverlay=hifiberry-dacplus
+dtoverlay=act-led,gpio=25
+dtoverlay=disable-bt
+dtoverlay=disable-wifi
 
 dtoverlay=gpio-shutdown,gpio_pin=8
 
