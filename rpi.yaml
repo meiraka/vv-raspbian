@@ -14,6 +14,24 @@
       group: root
     notify:
     - reboot
+  - name: set audio group limits
+    ansible.builtin.copy:
+      src: rpi/audio.limits.conf
+      dest: /etc/security/limits.d/audio.limits.conf
+      mode: '0644'
+      owner: root
+      group: root
+    notify:
+    - reboot
+  - name: set rpi sysctl
+    ansible.builtin.copy:
+      src: rpi/rpi.sysctl.conf
+      dest: /etc/sysctl.d/rpi.sysctl.conf
+      mode: '0644'
+      owner: root
+      group: root
+    notify:
+    - reload sysctl
   - name: create mpd conf
     ansible.builtin.copy:
       src: rpi/mpd.output.conf
@@ -33,6 +51,11 @@
   handlers:
   - name: reboot
     ansible.builtin.reboot:
+  - name: reload sysctl
+    ansible.builtin.command:
+      argv:
+      - sysctl
+      - -p
   - name: restart mpd
     ansible.builtin.systemd:
       name: mpd
