@@ -1,5 +1,5 @@
 [all]
-music.local
+vv.local
 
 [all:vars]
 mpd_version=0.22.11
