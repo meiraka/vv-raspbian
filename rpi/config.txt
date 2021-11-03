@@ -1,11 +1,32 @@
+# disable rainbow splash screen on boot
+disable_splash=1
+
+# disable hdmi output
+# see https://github.com/raspberrypi/firmware/issues/352#issuecomment-169455388
+hdmi_blanking=2
+
+# enable i2c interface
 dtparam=i2c_arm=on
+
+# enable i2s audio interface
 dtparam=i2s=on
+
+# use act led as power led
 dtparam=act_led_trigger=default-on
-dtoverlay=hifiberry-dacplus
+
+# set act led to gpio25
 dtoverlay=act-led,gpio=25
+
+# use i2s dac
+dtoverlay=hifiberry-dacplus
+
+# disable bluetooth
 dtoverlay=disable-bt
+
+# disable wifi
 dtoverlay=disable-wifi
 
+# set shutdown button to gpio8
 dtoverlay=gpio-shutdown,gpio_pin=8
 
 start_x=0
